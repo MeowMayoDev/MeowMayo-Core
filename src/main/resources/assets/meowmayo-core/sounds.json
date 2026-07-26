@@ -1,0 +1,6 @@
+{
+  "boom_sound": {
+    "category": "master",
+    "sounds": [ "meowmayo-core:boom" ]
+  }
+}

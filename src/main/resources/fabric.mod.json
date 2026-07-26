@@ -1,0 +1,38 @@
+{
+	"schemaVersion": 1,
+	"id": "meowmayo-core",
+	"version": "${version}",
+	"name": "MeowMayo Core",
+	"description": "mowma!",
+	"authors": [
+		"Me!"
+	],
+	"contact": {
+		"homepage": "",
+		"sources": ""
+	},
+	"license": "CC0-1.0",
+	"icon": "assets/meowmayo-core/icon.png",
+	"environment": "client",
+	"entrypoints": {
+		"main": [
+			"dev.meowmayo.mmcore.MeowMayoCore"
+		],
+		"client": [
+			"dev.meowmayo.mmcore.MeowMayoCoreClient"
+		]
+	},
+	"mixins": [
+		"meowmayo-core.mixins.json",
+		{
+			"config": "meowmayo-core.client.mixins.json",
+			"environment": "client"
+		}
+	],
+	"depends": {
+		"fabricloader": ">=0.18.4",
+		"minecraft": "~26.1",
+		"java": ">=25",
+		"fabric-api": "*"
+	}
+}

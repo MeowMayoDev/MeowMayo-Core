@@ -1,0 +1,14 @@
+{
+	"required": true,
+	"package": "dev.meowmayo.mmcore.mixin.client",
+	"compatibilityLevel": "JAVA_25",
+	"client": [
+      "ByeByeYggdrasil",
+      "ConnectionMixin",
+      "MinecraftMixin",
+      "KeyboardMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}
