@@ -150,7 +150,7 @@ public class SettingsGui extends Screen {
     @Override
     public boolean mouseScrolled(double d, double e, double f, double g) {
         scrollAmount -= (float) (g * 10.0F);
-        scrollAmount = Math.max(0, Math.min(scrollAmount, maxScroll));
+        scrollAmount = Math.clamp(scrollAmount, 0, maxScroll);
         return super.mouseScrolled(d, e, f, g);
     }
 

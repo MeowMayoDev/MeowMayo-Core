@@ -25,8 +25,7 @@ public class ScoreboardUtils {
                     String post = parameters.getPlayerSuffix().getString();
 
                     String line = ChatFormatting.stripFormatting(pre + post).trim();
-
-                    if (line.startsWith("⏣")) {
+                    if (line.startsWith("\uE067")) {
                         location = line;
                     }
                 }
