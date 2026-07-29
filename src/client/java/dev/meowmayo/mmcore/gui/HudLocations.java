@@ -42,7 +42,7 @@ public class HudLocations extends Screen {
         String query = searchField.getText().toLowerCase();
 
         this.addRenderableWidget(Button.builder(Component.literal("X"), button -> {
-            this.minecraft.setScreen(new MainGui());
+            this.minecraft.gui.setScreen(new MainGui());
         }).bounds(width - 25, 5, 20, 20).build());
 
         List<HudElementSetting> locations = ModConfig.getLocations();
@@ -62,7 +62,7 @@ public class HudLocations extends Screen {
 
             if (yPos > 30 && yPos < height - 50) {
                 this.addRenderableWidget(Button.builder(Component.literal(setting.getTitle()), button -> {
-                    this.minecraft.setScreen(new GuiHudEditor(setting));
+                    this.minecraft.gui.setScreen(new GuiHudEditor(setting));
                 }).bounds(width / 2 - 100, yPos, 200, 20).build());
             }
         }
@@ -90,7 +90,7 @@ public class HudLocations extends Screen {
             updateButtons();
         }
 
-        if (keyEvent.key() == 1) this.minecraft.setScreen(new MainGui());
+        if (keyEvent.key() == 1) this.minecraft.gui.setScreen(new MainGui());
 
         return super.keyPressed(keyEvent);
     }

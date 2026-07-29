@@ -23,19 +23,19 @@ public class MainGui extends Screen {
     @Override
     public void init() {
         this.addRenderableWidget(Button.builder(Component.literal("X"), button -> {
-            this.minecraft.setScreen(null);
+            this.minecraft.gui.setScreen(null);
         }).bounds(width - 25, 5, 20, 20).build());
 
         this.addRenderableWidget(Button.builder(Component.literal("Edit Config"), button -> {
-            this.minecraft.setScreen(new SettingsGui());
+            this.minecraft.gui.setScreen(new SettingsGui());
         }).bounds(5, 40, 150, 20).build());
 
         this.addRenderableWidget(Button.builder(Component.literal("Edit Gui"), button -> {
-            this.minecraft.setScreen(new HudLocations());
+            this.minecraft.gui.setScreen(new HudLocations());
         }).bounds(5, 70, 150, 20).build());
 
         this.addRenderableWidget(Button.builder(Component.literal("Edit Chat Macros"), button -> {
-            this.minecraft.setScreen(new MacroScreen());
+            this.minecraft.gui.setScreen(new MacroScreen());
         }).bounds(5, 100, 150, 20).build());
     }
 

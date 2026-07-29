@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class KeyboardMixin {
     @Inject(method = "keyPress", at = @At("HEAD"))
     private void keyPress(final long handle, final @KeyEvent.Action int action, final KeyEvent event, CallbackInfo ci) {
-        if (action == 1 && Minecraft.getInstance().screen == null) {
+        if (action == 1 && Minecraft.getInstance().gui.screen() == null) {
             for (ChatMacro m : ChatMacroManager.getMacros()) {
                  if (event.key() == m.key && ((event.modifiers() & GLFW.GLFW_MOD_SHIFT) != 0) == m.useShift && ((event.modifiers() & GLFW.GLFW_MOD_CONTROL) != 0) == m.useCtrl) {
                      if (m.command.startsWith("/")) {

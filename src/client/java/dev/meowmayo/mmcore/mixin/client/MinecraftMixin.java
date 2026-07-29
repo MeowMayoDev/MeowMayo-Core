@@ -15,7 +15,7 @@ public class MinecraftMixin {
     @Inject(method = "handleKeybinds", at = @At("HEAD"))
     private void onInput(CallbackInfo ci) {
         Minecraft client = (Minecraft) (Object) this;
-        if (client.player == null || client.screen != null) return;
+        if (client.player == null || client.gui.screen() != null) return;
 
         boolean attackIsDown = client.options.keyAttack.isDown();
         if (attackIsDown && !attackWasDown) {

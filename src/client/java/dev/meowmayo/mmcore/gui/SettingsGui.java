@@ -32,7 +32,7 @@ public class SettingsGui extends Screen {
     @Override
     public void init() {
         this.addRenderableWidget(Button.builder(Component.literal("X"), button -> {
-            this.minecraft.setScreen(new MainGui());
+            this.minecraft.gui.setScreen(new MainGui());
         }).bounds(width - 25, 5, 20, 20).build());
 
         int y = 35;
@@ -207,7 +207,7 @@ public class SettingsGui extends Screen {
             rebuildSettingsList();
         }
 
-        if (keyEvent.key() == 1) this.minecraft.setScreen(new MainGui());
+        if (keyEvent.key() == 1) this.minecraft.gui.setScreen(new MainGui());
 
         for (ISettingComponent row : activeRows) {
             row.keyPressed(keyEvent.key());

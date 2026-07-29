@@ -21,8 +21,8 @@ public class ScoreboardUtils {
                 if (params.isPresent()) {
                     ClientboundSetPlayerTeamPacket.Parameters parameters = params.get();
 
-                    String pre = parameters.getPlayerPrefix().getString();
-                    String post = parameters.getPlayerSuffix().getString();
+                    String pre = parameters.playerPrefix().getString();
+                    String post = parameters.playerSuffix().getString();
 
                     String line = ChatFormatting.stripFormatting(pre + post).trim();
                     if (line.startsWith("\uE067")) {

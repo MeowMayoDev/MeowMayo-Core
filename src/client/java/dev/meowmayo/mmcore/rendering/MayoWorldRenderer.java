@@ -1,29 +1,30 @@
 package dev.meowmayo.mmcore.rendering;
 
+import com.mojang.blaze3d.PrimitiveTopology;
 import com.mojang.blaze3d.buffers.GpuBuffer;
 import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.systems.CommandEncoder;
 import com.mojang.blaze3d.systems.RenderPass;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.*;
-//import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext;
-//import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents;
+import com.mojang.blaze3d.vertex.BufferBuilder;
+import com.mojang.blaze3d.vertex.ByteBufferBuilder;
+import com.mojang.blaze3d.vertex.MeshData;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderContext;
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-//import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.client.gui.font.TextRenderable;
 import net.minecraft.client.renderer.MappableRingBuffer;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
+import java.util.Optional;
 import java.util.OptionalDouble;
-import java.util.OptionalInt;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -104,17 +105,17 @@ public class MayoWorldRenderer {
             MeshData fEspMesh = prepare(FILLED_ESP_ALLOC, MayoRenderPipeline.FILLED_BOX_ESP, true, true, camera);
             MeshData sEspMesh = prepare(SKELETON_ESP_ALLOC, MayoRenderPipeline.SKELETON_BOX_ESP, false, true, camera);
 
-            if (fMesh != null) upload(encoder, fMesh, 0);
-            if (sMesh != null) upload(encoder, sMesh, 1);
-            if (fEspMesh != null) upload(encoder, fEspMesh, 2);
-            if (sEspMesh != null) upload(encoder, sEspMesh, 3);
+            if (fMesh != null) upload(fMesh, 0);
+            if (sMesh != null) upload(sMesh, 1);
+            if (fEspMesh != null) upload(fEspMesh, 2);
+            if (sEspMesh != null) upload(sEspMesh, 3);
 
             GpuBufferSlice transforms = RenderSystem.getDynamicUniforms()
-                    .writeTransform(RenderSystem.getModelViewMatrix(), COLOR_MODULATOR, MODEL_OFFSET, TEXTURE_MATRIX);
+                    .writeTransform(RenderSystem.getModelViewMatrixCopy(), COLOR_MODULATOR, MODEL_OFFSET, TEXTURE_MATRIX);
 
             try (RenderPass pass = encoder.createRenderPass(() -> "Waypoints Pass",
-                    Minecraft.getInstance().getMainRenderTarget().getColorTextureView(), OptionalInt.empty(),
-                    Minecraft.getInstance().getMainRenderTarget().getDepthTextureView(), OptionalDouble.empty())) {
+                    Minecraft.getInstance().gameRenderer.mainRenderTarget().getColorTextureView(), Optional.empty(),
+                    Minecraft.getInstance().gameRenderer.mainRenderTarget().getDepthTextureView(), OptionalDouble.empty())) {
 
                 RenderSystem.bindDefaultUniforms(pass);
 
@@ -156,28 +157,38 @@ public class MayoWorldRenderer {
         float scaleFactor = scale * 0.2f;
         matrices.scale(scaleFactor, -scaleFactor, scaleFactor);
 
-        Matrix4f poseMatrix = matrices.last().pose();
-
-        var immediate = MultiBufferSource.immediate(new ByteBufferBuilder(1024));
-
-        mc.font.drawInBatch(
+        Font.PreparedText prep = mc.font.prepareText(
                 text,
                 -mc.font.width(text) / 2f, 0f,
                 -1,
                 true,
-                poseMatrix,
-                immediate,
-                Font.DisplayMode.SEE_THROUGH,
-                0,
-                1
+                0
         );
 
-        immediate.endBatch();
+        net.minecraft.client.renderer.OrderedSubmitNodeCollector collector = context.submitNodeCollector();
+        prep.visit(new Font.GlyphVisitor() {
+            @Override
+            public void acceptGlyph(TextRenderable.Styled glyph) {
+                collector.submitText(
+                        matrices,
+                        -mc.font.width(text) / 2f,
+                        0f,
+                        net.minecraft.network.chat.Component.literal(text).getVisualOrderText(),
+                        true,
+                        Font.DisplayMode.SEE_THROUGH,
+                        15728880,
+                        -1,
+                        0,
+                        0
+                );
+            }
+        });
+
         matrices.popPose();
     }
 
     private static MeshData prepare(ByteBufferBuilder alloc, RenderPipeline pipe, boolean filled, boolean esp, Vec3 camera) {
-        BufferBuilder b = new BufferBuilder(alloc, VertexFormat.Mode.QUADS, pipe.getVertexFormat());
+        BufferBuilder b = new BufferBuilder(alloc, PrimitiveTopology.QUADS, pipe.getVertexFormatBinding(0));
         boolean any = false;
         for (BoxData box : BOXES.values()) {
             if (box.filled == filled && box.esp == esp) {
@@ -188,11 +199,11 @@ public class MayoWorldRenderer {
         return any ? b.build() : null;
     }
 
-    private static void upload(CommandEncoder encoder, MeshData mesh, int type) {
+    private static void upload(MeshData mesh, int type) {
         int size = mesh.drawState().vertexCount() * mesh.drawState().format().getVertexSize();
         MappableRingBuffer ring = getRing(type, size);
 
-        try (GpuBuffer.MappedView view = encoder.mapBuffer(ring.currentBuffer().slice(0, size), false, true)) {
+        try (GpuBufferSlice.MappedView view = ring.currentBuffer().slice(0,size).map(false, true)) {
             org.lwjgl.system.MemoryUtil.memCopy(mesh.vertexBuffer(), view.data());
         }
     }
@@ -219,14 +230,20 @@ public class MayoWorldRenderer {
     }
 
     private static void draw(RenderPass pass, RenderPipeline pipe, MeshData mesh, GpuBufferSlice transforms, int type) {
-        MappableRingBuffer ring = getRing(type, 0);
-        pass.setPipeline(pipe);
-        pass.setUniform("DynamicTransforms", transforms);
-        pass.setVertexBuffer(0, ring.currentBuffer());
+        int indexCount = mesh.drawState().indexCount();
+        int vertexByteSize = mesh.drawState().vertexCount() * mesh.drawState().format().getVertexSize();
+        MappableRingBuffer ring = getRing(type, vertexByteSize);
 
-        RenderSystem.AutoStorageIndexBuffer indices = RenderSystem.getSequentialBuffer(mesh.drawState().mode());
+        pass.setPipeline(pipe);
+
+        RenderSystem.bindDefaultUniforms(pass);
+        pass.setUniform("DynamicTransforms", transforms);
+        pass.setVertexBuffer(0, ring.currentBuffer().slice(0, vertexByteSize));
+
+        RenderSystem.AutoStorageIndexBuffer indices = RenderSystem.getSequentialBuffer(mesh.drawState().primitiveTopology());
         pass.setIndexBuffer(indices.getBuffer(mesh.drawState().indexCount()), indices.type());
-        pass.drawIndexed(0, 0, mesh.drawState().indexCount(), 1);
+
+        pass.drawIndexed(indexCount, 1, 0, 0, 0);
     }
 
     private static void addBoxVertices(BufferBuilder b, float rx, float ry, float rz, BoxData box) {

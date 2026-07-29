@@ -29,7 +29,7 @@ public class MacroScreen extends Screen {
     protected void init() {
         entries.clear();
         this.addRenderableWidget(Button.builder(Component.literal("X"), button -> {
-            this.minecraft.setScreen(new MainGui());
+            this.minecraft.gui.setScreen(new MainGui());
         }).bounds(width - 25, 5, 20, 20).build());
 
         this.addRenderableWidget(Button.builder(Component.literal("Add New Macro"), b -> {

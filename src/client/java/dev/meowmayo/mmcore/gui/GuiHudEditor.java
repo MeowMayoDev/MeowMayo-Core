@@ -85,7 +85,7 @@ public class GuiHudEditor extends Screen {
     @Override
     public boolean keyPressed(KeyEvent keyEvent) {
         if (keyEvent.key() == 1) {
-            this.minecraft.setScreen(new HudLocations());
+            this.minecraft.gui.setScreen(new HudLocations());
         }
         return super.keyPressed(keyEvent);
     }

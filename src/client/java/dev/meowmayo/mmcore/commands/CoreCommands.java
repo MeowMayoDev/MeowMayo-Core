@@ -11,7 +11,7 @@ public class CoreCommands {
             dispatcher.register(ClientCommands.literal("meowmayo")
                     .executes(context -> {
                         Minecraft.getInstance().execute(() -> {
-                            Minecraft.getInstance().setScreen(new MainGui());
+                            Minecraft.getInstance().gui.setScreen(new MainGui());
                         });
                         return 1;
                     })
@@ -20,7 +20,7 @@ public class CoreCommands {
             dispatcher.register(ClientCommands.literal("mm")
                     .executes(context -> {
                         Minecraft.getInstance().execute(() -> {
-                            Minecraft.getInstance().setScreen(new MainGui());
+                            Minecraft.getInstance().gui.setScreen(new MainGui());
                         });
                         return 1;
                     })
