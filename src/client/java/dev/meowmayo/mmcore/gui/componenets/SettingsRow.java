@@ -1,9 +1,10 @@
-package dev.meowmayo.mmcore.gui;
+package dev.meowmayo.mmcore.gui.componenets;
 
 import dev.meowmayo.mmcore.config.ModConfig;
 import dev.meowmayo.mmcore.config.settings.*;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.util.FormattedCharSequence;
 
@@ -14,7 +15,7 @@ public class SettingsRow {
         void render(GuiGraphicsExtractor graphics, Font tr, int x, int y, int width, int mouseX, int mouseY);
         void mouseDown(double mouseX, double mouseY, int screenWidth, int screenHeight, int button);
         void mouseUp(double mouseX, double mouseY, int screenWidth, int screenHeight, int button);
-        void keyPressed(int keyCode);
+        void keyPressed(KeyEvent keyEvent);
         void charTyped(char chr);
         int getHeight();
     }
@@ -83,7 +84,7 @@ public class SettingsRow {
         }
 
         @Override
-        public void keyPressed(int keyCode) {
+        public void keyPressed(KeyEvent keyEvent) {
         }
 
         @Override
@@ -124,7 +125,7 @@ public class SettingsRow {
         }
 
         @Override
-        public void keyPressed(int keyCode) {
+        public void keyPressed(KeyEvent keyEvent) {
         }
 
         @Override
@@ -198,7 +199,7 @@ public class SettingsRow {
         }
 
         @Override
-        public void keyPressed(int keyCode) {
+        public void keyPressed(KeyEvent keyEvent) {
         }
 
         @Override
@@ -249,9 +250,9 @@ public class SettingsRow {
         }
 
         @Override
-        public void keyPressed(int keyCode) {
+        public void keyPressed(KeyEvent keyEvent) {
             if (textField.isFocused()) {
-                textField.keyPressed(keyCode);
+                textField.keyPressed(keyEvent);
                 ModConfig.edit(setting.getTitle(), textField.getText());
             }
         }

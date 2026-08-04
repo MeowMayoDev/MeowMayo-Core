@@ -1,8 +1,8 @@
 package dev.meowmayo.mmcore.gui;
 
+import dev.meowmayo.mmcore.gui.componenets.MeowScreen;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
@@ -11,13 +11,14 @@ import net.minecraft.resources.Identifier;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.Supplier;
 
-public class MainGui extends Screen {
+public class MainGui extends MeowScreen {
     private static final Identifier LOGO_TEXTURE = Identifier.fromNamespaceAndPath("meowmayo-core", "textures/meowmayo.png");
     private final List<Ripple> activeRipples = new ArrayList<>();
 
     public MainGui() {
-        super(Component.literal("MeowMayo Main Menu"));
+        super(Component.literal("MeowMayo Main Menu"), "Main Menu");
     }
 
     @Override
@@ -34,9 +35,14 @@ public class MainGui extends Screen {
             this.minecraft.gui.setScreen(new HudLocations());
         }).bounds(5, 70, 150, 20).build());
 
-        this.addRenderableWidget(Button.builder(Component.literal("Edit Chat Macros"), button -> {
-            this.minecraft.gui.setScreen(new MacroScreen());
-        }).bounds(5, 100, 150, 20).build());
+        List<Supplier<MeowScreen>> screens = ScreenHandler.getScreens();
+        int y = 100;
+        for (Supplier<MeowScreen> sc : screens) {
+            this.addRenderableWidget(Button.builder(Component.literal("Edit " + sc.get().name), button -> {
+                this.minecraft.gui.setScreen(sc.get());
+            }).bounds(5, y, 150, 20).build());
+            y += 30;
+        }
     }
 
     @Override

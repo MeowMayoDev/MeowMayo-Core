@@ -3,12 +3,12 @@
 	"id": "meowmayo-core",
 	"version": "${version}",
 	"name": "MeowMayo Core",
-	"description": "mowma!",
+	"description": "MeowMayo Core Library Mod",
 	"authors": [
-		"Me!"
+		"MaoMao"
 	],
 	"contact": {
-		"homepage": "",
+		"homepage": "https://meowmayo.dev",
 		"sources": ""
 	},
 	"license": "CC0-1.0",

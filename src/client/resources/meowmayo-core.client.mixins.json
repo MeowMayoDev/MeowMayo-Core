@@ -5,8 +5,7 @@
 	"client": [
       "ByeByeYggdrasil",
       "ConnectionMixin",
-      "MinecraftMixin",
-      "KeyboardMixin"
+      "MinecraftMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
