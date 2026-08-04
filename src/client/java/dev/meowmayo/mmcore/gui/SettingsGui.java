@@ -3,20 +3,23 @@ package dev.meowmayo.mmcore.gui;
 import dev.meowmayo.mmcore.config.MeowModule;
 import dev.meowmayo.mmcore.config.ModConfig;
 import dev.meowmayo.mmcore.config.settings.*;
-import dev.meowmayo.mmcore.gui.SettingsRow.*;
-import dev.meowmayo.mmcore.gui.SettingsRow.ISettingComponent;
+import dev.meowmayo.mmcore.gui.componenets.MeowScreen;
+import dev.meowmayo.mmcore.gui.componenets.SettingsRow;
+import dev.meowmayo.mmcore.gui.componenets.SettingsRow.*;
+import dev.meowmayo.mmcore.gui.componenets.SettingsRow.ISettingComponent;
+import dev.meowmayo.mmcore.gui.componenets.TextField;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
+import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class SettingsGui extends Screen {
+public class SettingsGui extends MeowScreen {
     private int selectedCategory = 0;
     private float scrollAmount = 0;
     private int maxScroll = 0;
@@ -26,7 +29,7 @@ public class SettingsGui extends Screen {
     private final List<ISettingComponent> activeRows = new ArrayList<>();
 
     public SettingsGui() {
-        super(Component.literal("Settings"));
+        super(Component.literal("Settings"), "Settings Editor");
     }
 
     @Override
@@ -199,20 +202,29 @@ public class SettingsGui extends Screen {
 
     @Override
     public boolean keyPressed(KeyEvent keyEvent) {
-        String oldText = searchField.getText();
-        searchField.keyPressed(keyEvent.key());
+        if (searchField.isFocused()) {
+            String oldText = searchField.getText();
+            searchField.keyPressed(keyEvent);
 
-        if (!searchField.getText().equals(oldText)) {
-            scrollAmount = 0;
-            rebuildSettingsList();
+            if (!searchField.getText().equals(oldText)) {
+                scrollAmount = 0;
+                rebuildSettingsList();
+            }
+            return true;
         }
-
-        if (keyEvent.key() == 1) this.minecraft.setScreen(new MainGui());
 
         for (ISettingComponent row : activeRows) {
-            row.keyPressed(keyEvent.key());
+            row.keyPressed(keyEvent);
         }
 
+        if (keyEvent.key() == GLFW.GLFW_KEY_ESCAPE) {
+            ScreenHandler.openMain();
+            return true;
+        }
+
+        if (keyEvent.key() == GLFW.GLFW_KEY_ENTER || keyEvent.key() == GLFW.GLFW_KEY_KP_ENTER || keyEvent.key() == GLFW.GLFW_KEY_TAB) {
+            return true;
+        }
         return super.keyPressed(keyEvent);
     }
 
