@@ -1,8 +1,9 @@
-package dev.meowmayo.mmcore.gui;
+package dev.meowmayo.mmcore.gui.componenets;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.input.KeyEvent;
 import org.lwjgl.glfw.GLFW;
 
 public class TextField {
@@ -66,19 +67,37 @@ public class TextField {
         }
     }
 
-    public boolean keyPressed(int keyCode) {
+    public boolean keyPressed(KeyEvent event) {
         if (!focused) return false;
 
-        if (keyCode == GLFW.GLFW_KEY_BACKSPACE && !text.isEmpty() && cursorPosition > 0) {
-            text = text.substring(0, cursorPosition - 1) + text.substring(cursorPosition);
-            cursorPosition--;
-            return true;
-        }
-        if (keyCode == GLFW.GLFW_KEY_LEFT && cursorPosition > 0) {
-            cursorPosition--; return true;
-        }
-        if (keyCode == GLFW.GLFW_KEY_RIGHT && cursorPosition < text.length()) {
-            cursorPosition++; return true;
+        int keyCode = event.key();
+
+        if (((event.modifiers() & GLFW.GLFW_MOD_SHIFT) != 0) || ((event.modifiers() & GLFW.GLFW_MOD_CONTROL) != 0)) {
+            if (keyCode == GLFW.GLFW_KEY_BACKSPACE && !text.isEmpty() && cursorPosition > 0) {
+                int target = findPreviousWordStart();
+
+                text = text.substring(0, target) + text.substring(cursorPosition);
+                cursorPosition = target;
+                return true;
+            }
+            if (keyCode == GLFW.GLFW_KEY_LEFT && cursorPosition > 0) {
+                cursorPosition = findPreviousWordStart(); return true;
+            }
+            if (keyCode == GLFW.GLFW_KEY_RIGHT && cursorPosition < text.length()) {
+                cursorPosition = findNextWordEnd(); return true;
+            }
+        } else {
+            if (keyCode == GLFW.GLFW_KEY_BACKSPACE && !text.isEmpty() && cursorPosition > 0) {
+                text = text.substring(0, cursorPosition - 1) + text.substring(cursorPosition);
+                cursorPosition--;
+                return true;
+            }
+            if (keyCode == GLFW.GLFW_KEY_LEFT && cursorPosition > 0) {
+                cursorPosition--; return true;
+            }
+            if (keyCode == GLFW.GLFW_KEY_RIGHT && cursorPosition < text.length()) {
+                cursorPosition++; return true;
+            }
         }
         return false;
     }
@@ -101,5 +120,32 @@ public class TextField {
             this.cursorPosition = 0;
             this.renderOffset = 0;
         }
+    }
+
+    private int findPreviousWordStart() {
+        int pos = cursorPosition;
+
+        while (pos > 0 && Character.isWhitespace(text.charAt(pos - 1))) {
+            pos--;
+        }
+        while (pos > 0 && !Character.isWhitespace(text.charAt(pos - 1))) {
+            pos--;
+        }
+
+        return pos;
+    }
+
+    private int findNextWordEnd() {
+        int pos = cursorPosition;
+        int len = text.length();
+
+        while (pos < len && Character.isWhitespace(text.charAt(pos))) {
+            pos++;
+        }
+        while (pos < len && !Character.isWhitespace(text.charAt(pos))) {
+            pos++;
+        }
+
+        return pos;
     }
 }

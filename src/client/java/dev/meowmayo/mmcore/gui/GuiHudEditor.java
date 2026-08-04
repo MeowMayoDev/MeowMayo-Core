@@ -2,13 +2,14 @@ package dev.meowmayo.mmcore.gui;
 
 import dev.meowmayo.mmcore.config.ModConfig;
 import dev.meowmayo.mmcore.config.settings.HudElementSetting;
+import dev.meowmayo.mmcore.gui.componenets.MeowScreen;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
+import org.lwjgl.glfw.GLFW;
 
-public class GuiHudEditor extends Screen {
+public class GuiHudEditor extends MeowScreen {
     private final HudElementSetting element;
 
     // dragging state
@@ -16,7 +17,7 @@ public class GuiHudEditor extends Screen {
     private double dragOffsetX, dragOffsetY;
 
     public GuiHudEditor(HudElementSetting element) {
-        super(Component.literal("Editing: " + element.getTitle()));
+        super(Component.literal("Editing: " + element.getTitle()), "Edit Location");
         this.element = element;
     }
 
@@ -84,8 +85,9 @@ public class GuiHudEditor extends Screen {
 
     @Override
     public boolean keyPressed(KeyEvent keyEvent) {
-        if (keyEvent.key() == 1) {
+        if (keyEvent.key() == GLFW.GLFW_KEY_ESCAPE) {
             this.minecraft.setScreen(new HudLocations());
+            return true;
         }
         return super.keyPressed(keyEvent);
     }

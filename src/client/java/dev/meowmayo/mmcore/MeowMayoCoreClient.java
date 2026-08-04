@@ -1,7 +1,6 @@
 package dev.meowmayo.mmcore;
 
 import dev.meowmayo.mmcore.commands.CoreCommands;
-import dev.meowmayo.mmcore.config.ChatMacroManager;
 import dev.meowmayo.mmcore.rendering.MayoWorldRenderer;
 import dev.meowmayo.mmcore.screen.MayoScreenRenderer;
 import dev.meowmayo.mmcore.utils.PartyUtils;
@@ -17,7 +16,5 @@ public class MeowMayoCoreClient implements ClientModInitializer {
         ScoreboardUtils.init();
         MayoWorldRenderer.init();
         MayoScreenRenderer.init();
-
-        ChatMacroManager.init();
 	}
 }

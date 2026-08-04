@@ -2,18 +2,20 @@ package dev.meowmayo.mmcore.gui;
 
 import dev.meowmayo.mmcore.config.ModConfig;
 import dev.meowmayo.mmcore.config.settings.HudElementSetting;
+import dev.meowmayo.mmcore.gui.componenets.MeowScreen;
+import dev.meowmayo.mmcore.gui.componenets.TextField;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
+import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class HudLocations extends Screen {
+public class HudLocations extends MeowScreen {
     private TextField searchField;
 
     private int scrollOffset = 0;
@@ -25,7 +27,7 @@ public class HudLocations extends Screen {
     List<HudElementSetting> currentLocations = new ArrayList<>();
 
     public HudLocations() {
-        super(Component.literal("Hud Editor"));
+        super(Component.literal("Hud Editor"), "Hud Editor");
     }
 
     @Override
@@ -82,16 +84,25 @@ public class HudLocations extends Screen {
 
     @Override
     public boolean keyPressed(KeyEvent keyEvent) {
-        String oldText = searchField.getText();
-        searchField.keyPressed(keyEvent.key());
+        if (searchField.isFocused()) {
+            String oldText = searchField.getText();
+            searchField.keyPressed(keyEvent);
 
-        if (!searchField.getText().equals(oldText)) {
-            scrollOffset = 0;
-            updateButtons();
+            if (!searchField.getText().equals(oldText)) {
+                scrollOffset = 0;
+                updateButtons();
+            }
+            return true;
         }
 
-        if (keyEvent.key() == 1) this.minecraft.setScreen(new MainGui());
+        if (keyEvent.key() == GLFW.GLFW_KEY_ESCAPE) {
+            ScreenHandler.openMain();
+            return true;
+        }
 
+        if (keyEvent.key() == GLFW.GLFW_KEY_ENTER || keyEvent.key() == GLFW.GLFW_KEY_KP_ENTER || keyEvent.key() == GLFW.GLFW_KEY_TAB) {
+            return true;
+        }
         return super.keyPressed(keyEvent);
     }
 
